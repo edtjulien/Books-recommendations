@@ -31,7 +31,6 @@ def scrapping_book_runner(output_file, log_level = logging.INFO):
 
 class BabelioBookSpider(scrapy.Spider):
     name = 'babelio-book'
-    url_ = 'https://www.babelio.com/livres-'
     df_list_books = None
     
     def load_list_books(self, input_file):

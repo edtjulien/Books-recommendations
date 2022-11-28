@@ -2,6 +2,8 @@ LIST_BOOKS_FILE = 'output/splits/list-books-rebecca.json'
 FINAL_FILE = 'output/books-{}.json'
 STATUS_FILE = 'output/status-{}.csv'
 
+META_DATA_FILE = 'output/books-meta-data.json'
+
 DOWNLOAD_DELAY = 0.2
 
 NB_COMM_MIN = 30
