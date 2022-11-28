@@ -1,0 +1,12 @@
+{
+    "name": "Recommandations de livres",
+    "version": "1.0",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": ["*://*.babelio.com/*"],
+            "js": ["inject-reco.js"]
+        }
+    ],
+    "host_permissions": ["<all_urls>"]
+}
