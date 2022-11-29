@@ -40,16 +40,15 @@ class BabelioBookSpider(scrapy.Spider):
         self.df_list_books = self.load_list_books('output/list-books-noduplicate.json')
 
         for index, book in self.df_list_books.iterrows():
-            if index <= 5200:
+            if index <= 10900:
                  continue
-            if index > 5600:
+            if index > 12000:
                 break
             yield scrapy.Request(book['book_url'], callback=self.parse, meta={'data' : {'book_id': book['book_id'], 'book_url': book['book_url'], 'book_nb_comm':book['book_nb_comm']}})
 
 
     def parse(self, response):
         data = response.request.meta["data"]
-
 
         name = response.xpath('//*[@id="page_corps"]/div/div[3]/div[2]/div[1]/div[2]/span[1]/a/span/text()').get(default="").strip()
         surname = response.xpath('//*[@id="page_corps"]/div/div[3]/div[2]/div[1]/div[2]/span[1]/a/span/b/text()').get(default="").strip()
