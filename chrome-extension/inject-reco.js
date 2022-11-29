@@ -1,3 +1,5 @@
+// https://www.cssscript.com/google-style-draggable-modal-window-with-pure-javascript/
+
 const MOCKUP = [
     {
         title : "Fils de personne",

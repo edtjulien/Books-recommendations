@@ -3,6 +3,7 @@ FINAL_FILE = 'output/books-{}.json'
 STATUS_FILE = 'output/status-{}.csv'
 
 META_DATA_FILE = 'output/books-meta-data.json'
+USERS_FILE = 'output/users-data.json'
 
 DOWNLOAD_DELAY = 0.2
 
