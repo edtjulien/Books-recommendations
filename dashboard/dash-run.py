@@ -8,38 +8,70 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 df = pd.read_json('../output/final/data-books.json', lines=True)
 
 @app.callback(
-    [Output('subtitle', 'children'),
-    Output('gender-pie', 'figure')
-    ],
+    [Output('subtitle', 'children')],
    # [Input('input_search', 'value')],
-    Input('input-search', 'value'),
-    #State('input-search', 'value')
+    Input('submit-search', 'n_clicks'),
+    State('input-search', 'value')
     #Output('map-spot', 'figure'),
 )
-def update_graph(text):
+def update_graph(n_clicks, text):
     if not text:
         return ['']
     df_found = df.loc[df['title'].str.contains(text, case=False)].reset_index()
-    title = 'Aucun livre trouvé'
-    if df_found.shape[0] > 0:
-        title = df_found.loc[0,'title']
+    
+    if df_found.shape[0] == 0:
+        return 'Aucun livre trouvé'
 
-    book_id = df_found.loc[0,'book_id']
+    book = df_found.loc[0,:]
+    title = book['title']
+    book_id = book['book_id']
 
-    fig = px.pie(df[df['book_id'] == book_id], sdlf)
-        
-    return [f'Titre du livre: {title}'], fig
+    return [f'Titre du livre: {title} avec l\'id {book_id}']
 
 
-app.layout = html.Div(children=[
-    html.H1(children='Books reco'),
+app.layout = html.Div(id='container-main', className='container-main', children=[
 
-    dcc.Input(
-            id="input-search",
-            type='text',
-            value='to',
-            placeholder="Chercher un livre",
-        ),
+
+    html.Div(id='header-main', className='header-main', children=[
+                html.Div(children=[
+                        dcc.Input(
+                            id="input-search",
+                            className="input-text",
+                            type='text',
+                            placeholder="Chercher un livre",
+                        ),
+
+                        html.Button('Submit', id='submit-search', n_clicks=0),
+                ]),
+                html.H1(children='Books reco'),
+    ]),
+
+    html.Div(id='section-infos', className='section-infos section', children=[
+        html.Div(id='book-details', className='book-details box-graph', children=[
+            html.Div(id='subtitle', children=[], className='sub-title'),
+        ]),
+
+        html.Div(id='book-sentiments', className='book-sentiments box-graph', children=[
+            
+        ]),
+    ]),
+
+    html.Div(id='section-infos2', className='section-infos2 section', children=[
+        html.Div(id='book-reco', className='book-reco box-graph', children=[
+            
+        ]),
+
+        html.Div(id='book-gender', className='book-gender box-graph', children=[
+            
+        ]),
+
+        html.Div(id='book-evolution', className='book-evolution box-graph', children=[
+            
+        ]),
+    ]),
+
+
+    
     # dcc.Dropdown(
     #     options=[
     #         {'label': 'New York City', 'value': 'NYC'},
@@ -50,14 +82,11 @@ app.layout = html.Div(children=[
     #     multi=False,
     #     id='input'
     # ),
-    #html.Button('Submit', id='submit-search', n_clicks=0),
 
-    html.Div(id='subtitle', children=[], className='sub-title'),
-
-    dcc.Graph(
-        id='gender-pie',
-        figure={},
-    ),
+    # dcc.Graph(
+    #     id='map-spot',
+    #     figure={},
+    # ),
 ])
 
 

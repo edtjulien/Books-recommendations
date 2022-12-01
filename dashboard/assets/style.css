@@ -1,0 +1,72 @@
+body {
+    padding:0;
+    margin:0;
+}
+
+* {
+    --min-width: 400px;
+  }
+
+#_dash-app-content {
+    width:100vw;
+    height:100vh;
+    padding:0;
+    margin:0;
+    display:block;
+    
+}
+
+.container-main {
+    width:90%;
+    height:100%;
+    padding:0;
+    margin:0;
+    margin:0 auto 0 auto;
+}
+
+.header-main {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: cadetblue;
+    padding:10px;
+}
+
+h1 {
+    margin:0 20px 0 0
+}
+
+.section {
+    display:flex;
+    height:400px;
+    flex-wrap: wrap;
+    justify-content:flex-start;
+    flex-direction: row;
+    background-color:cadetblue;
+    
+}
+
+.box-graph {
+    flex-grow: 1;
+    margin:5px;
+    min-width:var(--min-width);
+    background-color: #EEE;
+}
+
+.input-text {
+    width:300px;
+    height:40px;
+}
+
+#submit-search {
+    height:40px;
+}
+
+/* section-infos
+book-details
+book-sentiments
+
+section-infos2
+book-reco
+book-gender
+book-evolution */
