@@ -70,7 +70,7 @@ function getData() {
 
 
     // fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-    fetch('http://127.0.0.1:8000/?id=1829', {
+    fetch('http://mldatago.com:8000/?id=1829', {
         method: 'GET', // *GET, POST, PUT, DELETE, etc.
         mode: 'no-cors', // no-cors, *cors, same-origin
     })
