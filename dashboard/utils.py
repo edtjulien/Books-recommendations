@@ -1,0 +1,54 @@
+import pandas as pd
+import plotly.express as px
+
+def mapper_df(df):
+    mapper,s1, s2 = {},[],[]
+    for el in df.columns[df.columns.str.startswith('sen_')]:
+        s1.append(el)
+        s2.append(el[4:])
+    mapper = {k:v for k,v in zip(s1,s2)}
+    df.rename(columns=mapper, inplace=True)
+    return df
+
+def mapper_series(serie):
+    s = []
+    for el in serie.index:
+        s.append(el[4:])
+    serie.index = s
+    return serie
+
+def genre(x):
+    if x== "F":
+        return x
+    if x== "M":
+        return x
+    else:
+        return "inconnu"
+
+def create_pie(df):
+    genre = df["genre"].value_counts()
+    l1,l2 = [],[]
+    for i in genre.values:
+        l1.append(i)
+    for j in genre.index:
+        l2.append(j)
+    return df, l1, l2
+
+def graph_date_for_book(df, book, gender=None):
+    df['new_date'] = pd.to_datetime(df['new_date'], errors='coerce')
+    df_date = df.sort_values('new_date')
+    df_date = df_date[df_date['title'] == book]
+    if gender:
+        df_date = df_date[df_date['gender'] == gender]
+    df_date["month"] =  df_date['new_date'].dt.month 
+    df_date["year"] = df_date['new_date'].dt.year
+    test = df_date.groupby(['year','month'])[['comm_id']].count().reset_index()
+    test["Period"] = test['year'].astype(str) +"-"+ test["month"].astype(str)
+    test["Period"] = pd.to_datetime(test["Period"]).dt.strftime('%Y-%m')
+    if test['year'].max() - test['year'].min() > 6:
+        test["Period"] = pd.to_datetime(test["Period"])
+        test["Period"] = pd.to_datetime(test.groupby(pd.Grouper(key='Period', freq='6M')).sum().reset_index()['Period'])
+    if test['year'].max() - test['year'].min() > 8 :
+        test["Period"] = pd.to_datetime(test["Period"]).dt.strftime('%Y')
+    fig = px.bar(test, x='Period', y='comm_id')
+    return fig
