@@ -8,6 +8,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 df_books = pd.read_csv('../output/books.csv')
 df_comms = pd.read_csv('../output/comms.csv')
+df_comms = utils.format_date(df_comms, 'date', utils.dict_mapping)
 
 @app.callback(
     [Output('subtitle', 'children'),
@@ -45,9 +46,9 @@ def update_graph(n_clicks, search_value):
 
     df_gender = df_comms[df_comms['book_id'] == book_id]
     df_gender["genre"] = df_gender["gender"].apply(utils.genre)
-    _,l1,l2 = utils.create_pie(df_gender)
+    df_gender,l1,l2 = utils.create_pie(df_gender)
 
-    fig_genre = px.pie(values=l1, names=l2, title='répartition des hommes et des femmes',color_discrete_sequence=px.colors.sequential.RdBu)
+    fig_genre = px.pie(values=l1, names=l2, title='répartition des hommes et des femmes', color_discrete_sequence=px.colors.sequential.ice)
     
 
     return [f'Titre du livre: {title} avec l\'id {book_id}'], fig_radar, fig_date, fig_genre
@@ -91,6 +92,7 @@ app.layout = html.Div(id='container-main', className='container-main', children=
 
         html.Div(id='book-gender', className='book-gender box-graph', children=[
             dcc.Graph(
+                responsive=True,
                 id='genre-map',
                 figure={},
             )

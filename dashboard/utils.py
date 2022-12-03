@@ -1,6 +1,32 @@
 import pandas as pd
 import plotly.express as px
 
+dict_mapping = {'janvier' : 'January',
+                'février' : 'February',
+                'fevrier' : 'February',
+                'mars' : 'March',
+                'avril' : 'April',
+                'mai' : 'May',
+                'juin' : 'June',
+                'juillet': 'July',
+                'août' : 'August',
+                'septembre' : 'September',
+                'octobre' : 'October',
+                'novembre' : 'November',
+                'décembre' : 'December'}  
+
+def format_date(df, col, dict_):
+    date_list = df[col].tolist()
+    new_date_list= []
+    for el in date_list:
+        for fr_word, en_word in dict_.items():
+            if fr_word in el:
+                el = el.strip().replace(fr_word, en_word)
+        new_date_list.append(el)
+    df['new_date'] = pd.Series(new_date_list)
+    df['new_date'] = pd.to_datetime(df['new_date'])
+    return df
+
 def mapper_df(df):
     mapper,s1, s2 = {},[],[]
     for el in df.columns[df.columns.str.startswith('sen_')]:
@@ -19,11 +45,11 @@ def mapper_series(serie):
 
 def genre(x):
     if x== "F":
-        return x
+        return "Femme"
     if x== "M":
-        return x
+        return "Homme"
     else:
-        return "inconnu"
+        return "Non renseigné"
 
 def create_pie(df):
     genre = df["genre"].value_counts()
