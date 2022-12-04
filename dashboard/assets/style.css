@@ -30,6 +30,16 @@ body {
     margin:0 auto 0 auto;
 }
 
+@media screen and (max-width: 700px) {
+    .container-main {
+        width:99%;
+    }
+
+    #drop-search {
+        width: 400px !important;
+    }
+}
+
 .header-main {
     display:flex;
     flex-direction: row;
@@ -50,7 +60,7 @@ body {
 
 .header-search div#search-label {
     width: 100%;
-    font-size:20px;
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
     margin-bottom: 15px;
@@ -230,7 +240,7 @@ ul.list-reco li a img {
 
 .param-button {
     margin-left:30px;
-    
+
 }
 
 .subtitle-params {

@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 import utils
 import dill
 import modelreco
-from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE
+from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -101,6 +101,8 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
     book_rating_count = ' (' + str(book['book_rating_count']) + ' notes)'
     url = book['book_url']
     author_url = book['book_author_url']
+    if author_url.startswith('/'):
+            author_url = URL_ROOT_WEBSITE + author_url
     img_url = book['img_url']
     if img_url.startswith('/'):
         img_url = URL_ROOT_WEBSITE + img_url
@@ -249,4 +251,4 @@ app.layout = html.Div(id='container-main', className='container-main', children=
 
 
 if __name__ == '__main__':
-    app.run_server(host="0.0.0.0", port="8050", debug=True)
+    app.run_server(host="0.0.0.0", port=SERVER_PORT, debug=True)
