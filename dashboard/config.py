@@ -4,5 +4,5 @@ MAX_TO_PREDICT = 10
 URL_ROOT_WEBSITE = 'https://www.babelio.com'
 BOOK_FILE = '../output/final/data-books.json'
 COMM_FILE = '../output/final/data-comm-light.json'
-MODEL_FILE = '../recommendation/data/model-reco.obj'
+MODEL_FILE = '../output/final/model-reco.obj'
 SERVER_PORT = '8080'
