@@ -9,7 +9,11 @@ import dill
 import modelreco
 from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT
 
+# https://fizzy.cc/deploy-dash-on-server/
+
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+server = app.server
 
 df_books = pd.read_json(BOOK_FILE, lines=True)
 df_comms = pd.read_json(COMM_FILE, lines=True)
