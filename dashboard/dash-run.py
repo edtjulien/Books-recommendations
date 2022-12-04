@@ -6,14 +6,9 @@ import dash_bootstrap_components as dbc
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-<<<<<<< HEAD
 df_books = pd.read_json('../output/final/data-books.json', lines=True)
 df_comms = pd.read_json('../output/final/data-comm.json', lines=True)
-=======
-df_books = pd.read_csv('../output/books.csv')
-df_comms = pd.read_csv('../output/comms.csv')
 df_comms = utils.format_date(df_comms, 'date', utils.dict_mapping)
->>>>>>> fc050be63a9e96b241e0628c373fc6713d403dd2
 
 @app.callback(
     [Output('subtitle', 'children'),

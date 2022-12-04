@@ -7,17 +7,22 @@ import dash_bootstrap_components as dbc
 import utils
 import dill
 import modelreco
-from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE
+
+
+DEFAULT_BOOK_ID = 1578
+DEFAULT_MODEL_PARAMS = {'tag_': 0, 'sen_': 50, 'jaccard': 50, 'book_rating_value': 10, 'book_nb_comm': 0, 'book_rating_count': 0}
+MAX_TO_PREDICT = 10
+URL_ROOT_WEBSITE = 'https://www.babelio.com'
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-df_books = pd.read_json(BOOK_FILE, lines=True)
-df_comms = pd.read_json(COMM_FILE, lines=True)
+df_books = pd.read_json('../output/final/data-books.json', lines=True)
+df_comms = pd.read_json('../output/final/data-comm.json', lines=True)
 df_comms = utils.format_date(df_comms, 'date', utils.dict_mapping)
 
-with open(MODEL_FILE, 'rb') as f:
+with open('../recommendation/data/model-reco.obj', 'rb') as f:
     model = dill.load(f)
- 
+
 model_params = DEFAULT_MODEL_PARAMS
 current_book_id = DEFAULT_BOOK_ID
 
@@ -55,8 +60,8 @@ def predict_reco(book_id):
     Output('book-details', 'children'),
     Output('radar-map', 'figure'),
     Output('list-reco', 'children'),
-    Output('date-map', 'figure'),
-    Output('genre-map', 'figure'),
+    # Output('date-map', 'figure'),
+    # Output('genre-map', 'figure')
     Input("drop-search", "value"),
     Input("open-params", "n_clicks"),
     Input("submit-model", "n_clicks"),
@@ -115,13 +120,15 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
     fig_radar.update_traces(fill='toself')
 
     # START
-    fig_date = utils.graph_date_for_book(df_comms, title)
 
-    df_gender = df_comms[df_comms['book_id'] == book_id]
-    df_gender["genre"] = df_gender["gender"].apply(utils.genre)
-    df_gender,l1,l2 = utils.create_pie(df_gender)
+    # fig_date = utils.graph_date_for_book(df_comms, title)
 
-    fig_genre = px.pie(values=l1, names=l2, color_discrete_sequence=px.colors.sequential.ice)
+    # df_gender = df_comms[df_comms['book_id'] == book_id]
+    # df_gender["genre"] = df_gender["gender"].apply(utils.genre)
+    # df_gender,l1,l2 = utils.create_pie(df_gender)
+
+    # fig_genre = px.pie(values=l1, names=l2, color_discrete_sequence=px.colors.sequential.ice)
+
     # END
 
     list_reco = predict_reco(book_id)
@@ -135,7 +142,7 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
                         ])
                     ]
 
-    return is_open_offset, book_details, go.FigureWidget(fig_radar), list_reco, go.FigureWidget(fig_genre), go.FigureWidget(fig_date)
+    return is_open_offset, book_details, go.FigureWidget(fig_radar), list_reco#, go.FigureWidget(fig_genre), go.FigureWidget(fig_date)
 
 @app.callback(
     Output("drop-search", "options"),

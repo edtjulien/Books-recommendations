@@ -78,3 +78,9 @@ def graph_date_for_book(df, book, gender=None):
         test["Period"] = pd.to_datetime(test["Period"]).dt.strftime('%Y')
     fig = px.bar(test, x='Period', y='comm_id')
     return fig
+
+def update_params_model(params_dic:dict, previous_dic):
+    dic = previous_dic.copy()
+    for key,value in params_dic.items():
+        dic[key] = value
+    return dic

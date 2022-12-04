@@ -1,10 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
 body {
     padding:0;
     margin:0;
+    background-color: rgb(243,245,249);
+    font-family: 'Montserrat', sans-serif;
 }
 
 * {
     --min-width: 400px;
+    --link-color:rgb(0, 108, 108);
+    --link-color-hover:rgb(0, 152, 152);
   }
 
 #_dash-app-content {
@@ -27,46 +33,211 @@ body {
 .header-main {
     display:flex;
     flex-direction: row;
-    justify-content: space-between;
-    background-color: cadetblue;
+    justify-content: flex-end;
     padding:10px;
 }
 
+.logo {
+    height:85px;
+}
+
+.header-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items:flex-end;
+    justify-content: center;
+}
+
+.header-search div#search-label {
+    width: 100%;
+    font-size:20px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+}
+.header-search button {
+    margin-bottom:30px;
+    margin-left:20px
+}
+
+#drop-search {
+    width: 500px;
+    font-size: 18px !important;
+    margin-bottom:20px;
+}
+
+.Select-input {
+    height: 45px;
+}
+
+.Select-input input{
+    height: 41px;
+}
+
+.Select-control{
+    height: 50px;
+}
+
+.Select-placeholder{
+    line-height: 45px;
+}
+
+.Select-value {
+    line-height: 45px !important;
+}
+
 h1 {
-    margin:0 20px 0 0
+    margin:0 20px 0 0;
 }
 
 .section {
     display:flex;
-    height:400px;
     flex-wrap: wrap;
     justify-content:flex-start;
     flex-direction: row;
-    background-color:cadetblue;
-    
 }
 
 .box-graph {
     flex-grow: 1;
-    margin:5px;
+    margin:15px;
     min-width:var(--min-width);
-    background-color: #EEE;
+    background-color: #FFF;
+    padding:15px;
+    border-radius: 10px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.input-text {
-    width:300px;
-    height:40px;
+.head-box {
+    width:100%;
+    padding-bottom:10px;
+    font-weight: 500;
+    color:#666;
+    font-size:16px;
+    border-bottom:1px solid #DDD;
 }
 
-#submit-search {
-    height:40px;
+#book-reco .head-box {
+    padding:10px 0 10px 15px;
+    margin-bottom: 5px;
 }
 
-/* section-infos
-book-details
-book-sentiments
 
-section-infos2
-book-reco
-book-gender
-book-evolution */
+.book-details {
+    width:150px;
+    padding:30px;
+    /* box-shadow:none;
+    background-color: initial; */
+}
+
+.book-details a {
+    text-decoration: none;
+    color:var(--link-color);
+}
+
+.book-details a:hover {
+    color:var(--link-color-hover);
+}
+
+.rating-value {
+    font-weight: 600;
+}
+
+.book-details img {
+    max-height: 300px;
+    border:1px solid black;
+    margin-bottom:20px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.author {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.book-sentiments {
+    flex-grow: 2;
+    height: fit-content;
+}
+
+.book-reco {
+    background-color: #FFF;
+    padding:5px;
+    width: 200px;
+}
+
+ul.list-reco {
+    list-style: none;
+    padding:0;
+    height:430px;
+    overflow: scroll;
+}
+
+ul.list-reco li {
+    width:100%;
+    height: 85px;
+    list-style: none;
+    padding:0;
+    margin:0;
+    margin-bottom: 2px;
+}
+
+ul.list-reco li a {
+    display:flex;
+    align-items:center;
+    width:100%;
+    height:100%;
+    font-weight: 400;
+    text-decoration: none;
+    color: var(--link-color);
+    background-color: #F5F5F5;
+    padding-left:10px;
+    transition: padding-left 300ms ease-out 0ms
+}
+
+ul.list-reco li a:hover {
+    background-color: #FAFAFA;
+    padding-left:30px;
+}
+
+ul.list-reco li a img {
+    margin-right:10px;
+    height: 100%
+}
+
+.footer {
+    height:90px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.footer::before {
+    content:'';
+    display: block;
+    width:50%;
+    margin: 0 auto 20px auto;
+    border-bottom: 1px solid #AAA;
+}
+
+.book-reco .head-box {
+    display:flex;
+    justify-content: space-between;
+}
+
+.param-button {
+    margin-left:30px;
+    
+}
+
+.subtitle-params {
+    margin-bottom:40px;
+}
+
+.title-params {
+    margin-top:30px;
+    font-weight: 500;
+}
