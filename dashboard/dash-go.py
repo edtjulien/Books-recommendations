@@ -10,6 +10,7 @@ import modelreco
 from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT
 
 # https://fizzy.cc/deploy-dash-on-server/
+# gunicorn dash-go:server -b :8080
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -127,7 +128,7 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
     df_gender["genre"] = df_gender["gender"].apply(utils.genre)
     df_gender,l1,l2 = utils.create_pie(df_gender)
 
-    fig_genre = px.pie(values=l1, names=l2, color_discrete_sequence=px.colors.sequential.ice)
+    fig_genre = px.pie(values=l1, names=l2)
     # END
 
     list_reco = predict_reco(book_id)
@@ -169,7 +170,7 @@ app.layout = html.Div(id='container-main', className='container-main', children=
                 html.P("Réglages des paramètres du modèle de recommandation :", className='subtitle-params'),
                 html.P('Sentiments', className='title-params'),
                 dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['sen_'], id='slider-sen', marks=None),
-                html.P('Contexte vocabulaire', className='title-params'),
+                html.P('Similarité vocabulaire', className='title-params'),
                 dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['jaccard'], id='slider-jaccard', marks=None),
                 html.P('Thèmes', className='title-params'),
                 dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['tag_'], id='slider-tags', marks=None),
@@ -201,7 +202,6 @@ app.layout = html.Div(id='container-main', className='container-main', children=
                         ),
                 ]),
                 
-
     ]),
 
     html.Div(id='section-infos', className='section-infos section', children=[

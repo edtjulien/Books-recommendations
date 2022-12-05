@@ -58,7 +58,12 @@ class BookReco:
             print('Error Jaccard in __get_jaccard_score')
             return None
 
-        return pd.concat([df1,df2], axis=0)
+        if type(df1) is not pd.Series:
+            return df2
+        elif type(df2) is not pd.Series:
+            return df1
+        else:
+            return pd.concat([df1,df2], axis=0)
 
     def predict(self, book_id):
 

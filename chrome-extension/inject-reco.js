@@ -66,19 +66,19 @@ function getData() {
     if(!isBookPage())
         return;
 
-    console.log("BBBBook page :", window.location.href)
+    // console.log("BBBBook page :", window.location.href)
 
 
-    // fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-    fetch('http://mldatago.com:8000/?id=1829', {
-        method: 'GET', // *GET, POST, PUT, DELETE, etc.
-        mode: 'no-cors', // no-cors, *cors, same-origin
-    })
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    // fetch('http://mldatago.com:8000/?id=1829', {
+    //     method: 'GET', // *GET, POST, PUT, DELETE, etc.
+    //     mode: 'no-cors', // no-cors, *cors, same-origin
+    // })
     .then(data => {
         return data;
     })
     .then(post => {
-        console.log(post)
+        //console.log(post)
 
         // console.log(post);
         createHTML(MOCKUP);
