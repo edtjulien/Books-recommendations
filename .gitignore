@@ -12,6 +12,8 @@ __pycache__/
 .zip
 *.obj
 .obj
+.db
+*.db
 data/
 !manifest.json
 

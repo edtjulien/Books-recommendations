@@ -24,7 +24,7 @@ def format_date(df, col, dict_):
                 el = el.strip().replace(fr_word, en_word)
         new_date_list.append(el)
     df['new_date'] = pd.Series(new_date_list)
-    df['new_date'] = pd.to_datetime(df['new_date'])
+    df['new_date'] = pd.to_datetime(df['new_date'], errors='coerce')
     return df
 
 def mapper_df(df):
@@ -60,12 +60,13 @@ def create_pie(df):
         l2.append(j)
     return df, l1, l2
 
-def graph_date_for_book(df, book, gender=None):
-    df['new_date'] = pd.to_datetime(df['new_date'], errors='coerce')
+def graph_date_for_book(df, gender=None):
+    df =  format_date(df, 'date', dict_mapping)
     df_date = df.sort_values('new_date')
-    df_date = df_date[df_date['title'] == book]
-    if gender:
+    
+    if gender is None:
         df_date = df_date[df_date['gender'] == gender]
+    
     df_date["month"] =  df_date['new_date'].dt.month 
     df_date["year"] = df_date['new_date'].dt.year
     test = df_date.groupby(['year','month'])[['comm_id']].count().reset_index()

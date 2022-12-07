@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MinMaxScaler
@@ -11,6 +10,7 @@ class BookReco:
         self.predict_scores = None
         self.weights = {}
         self.df_jaccard = None
+        self.data_empty = None
         self.data_score = None
 
     def add_vector(self, col_prefix, weight=1):
@@ -33,6 +33,7 @@ class BookReco:
 
     def fit(self, data):
         self.data = data
+        self.data_empty = self.data[['book_id']]
 
         for i,vector in enumerate(self.vectors):
             feats_cs = self.__get_cosine_similarity(vector['col_name'])
@@ -42,6 +43,8 @@ class BookReco:
             X = self.data.loc[:,[scalar['col_name']]]
             X = MinMaxScaler().fit_transform(X)
             self.scalars[i] = {**scalar, 'scaled': X.reshape(-1)}
+
+        del self.data # to reduce the size of the model. No need anymore the data
 
     def set_weight(self, weights:dict):
         self.weights = weights
@@ -67,14 +70,17 @@ class BookReco:
 
     def predict(self, book_id):
 
+        if self.data_empty is None:
+            print(f"Fit the model before predict")
+            return None
+        
         try:
-            index_book = self.data.query('book_id == @book_id').index.values.astype(int)[0]
+            index_book = self.data_empty.query('book_id == @book_id').index.values.astype(int)[0]
         except:
             print(f"Can't find book_id: {book_id} in the dataset")
             return None
-        
-        # init data_score to empty
-        self.data_score = self.data[['book_id']]
+
+        self.data_score = self.data_empty
 
         # get all scores, apply weight
         weight_sum = 0 # to normalize at the end, like a mean
@@ -106,18 +112,21 @@ class BookReco:
 
         self.data_score =  self.data_score.sum(axis=1) / weight_sum
 
-        data = self.data.merge(pd.Series(self.data_score, name='score'), how='left', left_on='book_id', right_index=True)
+        #data = self.data.merge(pd.Series(self.data_score, name='score'), how='left', left_on='book_id', right_index=True)
+        #return data.query('book_id != @book_id') # we pull off the asked book_id drom the scores
+        return pd.Series(self.data_score[self.data_score.index != book_id], name='score')
 
-        return data.query('book_id != @book_id') # we pull off the asked book_id drom the scores
+    def format_predict(self, scores, max_books=5):
+        scores = scores.sort_values(ascending=False)
+        return scores[:max_books]
 
-    def format_tojson(self, scores, max_books):
+    def format_tojson(self, scores, data, max_books=5):
+        data = data.copy().merge(scores, how='left', left_on='book_id', right_index=True)
+        data = data.sort_values('score', ascending=False)
 
         output = []
         num = 0
-
-        scores = scores.sort_values('score', ascending=False)
-
-        for _, book in scores.iterrows():
+        for _, book in data.iterrows():
             output.append({
                 'title' : book['title'],
                 'url' : book['book_url'],

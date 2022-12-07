@@ -4,28 +4,41 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import dash_bootstrap_components as dbc
-import utils
 import dill
+import sqlite3
+import warnings
+import utils
 import modelreco
-from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT
+from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT, DB_FILE
+
+warnings.filterwarnings('ignore') 
 
 # https://fizzy.cc/deploy-dash-on-server/
-# gunicorn dash-go:server -b :8080
+# gunicorn dash-go:server -b :8080 &
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-
 server = app.server
-
-df_books = pd.read_json(BOOK_FILE, lines=True)
-df_comms = pd.read_json(COMM_FILE, lines=True)
-df_comms = utils.format_date(df_comms, 'date', utils.dict_mapping)
 
 with open(MODEL_FILE, 'rb') as f:
     model = dill.load(f)
- 
-model_params = DEFAULT_MODEL_PARAMS
-current_book_id = DEFAULT_BOOK_ID
 
+#df_books = pd.read_json(BOOK_FILE, lines=True)
+#df_comms = pd.read_json(COMM_FILE, lines=True)
+
+def get_data_byid(table, book_id, books_id_list=None):
+    conn = sqlite3.connect(DB_FILE)
+    if books_id_list is not None:
+        sql_query = pd.read_sql(f'SELECT * FROM {table} WHERE book_id IN ({ ",".join(books_id_list) })', conn)
+    else: sql_query = pd.read_sql(f'SELECT * FROM {table} WHERE book_id="{book_id}"', conn)
+    conn.close()
+    return pd.DataFrame(sql_query)
+
+def get_data_search(table, col_search, value):
+    conn = sqlite3.connect(DB_FILE)
+    sql_query = pd.read_sql(f'SELECT book_id, title, book_rating_value FROM {table} WHERE LOWER({col_search}) like "%{value.lower()}%" ORDER BY book_rating_value DESC', conn)
+    conn.close()
+    return pd.DataFrame(sql_query)
+ 
 def make_list_reco_html(list_json):
     list_reco=[]
     for reco in list_json:
@@ -40,17 +53,17 @@ def make_list_reco_html(list_json):
                     html.Img(src=img_url),
                     html.Div(children=[reco["title"]])
                 ],
-                className='link-'
             )
         ))
     return list_reco
 
-def predict_reco(book_id):
-    global model_params
+def predict_reco(book_id, model_params):
     global model
     model.set_weight(model_params)
-    recos = model.predict(int(book_id)) 
-    res = model.format_tojson(recos, max_books=MAX_TO_PREDICT)
+    scores = model.predict(int(book_id))
+    books_id_list = [str(bid) for bid in list(scores.index)]
+    df_books_reco = get_data_byid('books', None, books_id_list=books_id_list)
+    res = model.format_tojson(scores, df_books_reco, max_books=MAX_TO_PREDICT)
     list_reco = make_list_reco_html(res)
 
     return list_reco
@@ -72,33 +85,30 @@ def predict_reco(book_id):
     ]
 )
 def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_tags, param_rating):
-    global current_book_id, model_params
-
     if book_id is None:
-        book_id = current_book_id
+        book_id = DEFAULT_BOOK_ID
         #raise PreventUpdate
 
-    current_book_id = book_id
     is_open_offset = False
 
     # if toggle param
     button_id = ctx.triggered_id if not None else 'No clicks yet'
-
     if button_id == 'open-params':
         is_open_offset = True
-
     if button_id == 'submit-model':
-        model_params = utils.update_params_model({
-            'sen_':param_sen,
-            'tag_':param_tags,
-            'jaccard':param_jaccard,
-            'book_rating_value':param_rating
-        }, model_params)
         is_open_offset = False
+
+    model_params = utils.update_params_model({
+        'sen_':param_sen,
+        'tag_':param_tags,
+        'jaccard':param_jaccard,
+        'book_rating_value':param_rating
+    }, DEFAULT_MODEL_PARAMS)
+        
 
     # end if
 
-    book = df_books.query('book_id == @book_id').iloc[0,:]
+    book = get_data_byid('books', book_id).iloc[0,:]
 
     title = book['title']
     author = book['surname'] + ' ' + book['name']
@@ -112,7 +122,7 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
     if img_url.startswith('/'):
         img_url = URL_ROOT_WEBSITE + img_url
 
-    df_radar = book[[col for col in df_books.columns if col.startswith('sen')]].T 
+    df_radar = book[[col for col in book.index if col.startswith('sen')]].T 
     df_radar = utils.mapper_series(df_radar)
 
     fig_radar = px.line_polar(r = df_radar, # valeurs des axes du radar
@@ -122,16 +132,16 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
     fig_radar.update_traces(fill='toself')
 
     # START
-    fig_date = utils.graph_date_for_book(df_comms, title)
+    dfc = get_data_byid('comm', book_id)
+    fig_date = utils.graph_date_for_book(dfc, title)
 
-    df_gender = df_comms[df_comms['book_id'] == book_id]
-    df_gender["genre"] = df_gender["gender"].apply(utils.genre)
-    df_gender,l1,l2 = utils.create_pie(df_gender)
+    dfc["genre"] = dfc["gender"].apply(utils.genre)
+    _ , l1, l2 = utils.create_pie(dfc)
 
     fig_genre = px.pie(values=l1, names=l2)
     # END
 
-    list_reco = predict_reco(book_id)
+    list_reco = predict_reco(book_id, model_params)
 
     book_details = [html.Div(id='title', children=[html.A(href=url, children=title, target='_blank')], className='title'),
                     html.Div(id='author', children=html.A(href=author_url, children=author, target='_blank'), className='author'),
@@ -152,7 +162,7 @@ def update_options(search_value):
     if not search_value or len(search_value) < 3:
         raise PreventUpdate
     
-    df_found = df_books[['book_id','title','book_rating_value']].sort_values('book_rating_value', ascending=False).loc[df_books['title'].str.contains(search_value, case=False)].reset_index()
+    df_found = get_data_search('books', 'title', search_value) # check if needed to preprocess search_value to prevent sql injection
 
     if df_found.shape[0] > 0:
         df_found['title'] = df_found.apply(lambda book: book['title'] + ' (' + str(round(book['book_rating_value'],1)) + '/5)', axis=1)
@@ -198,7 +208,7 @@ app.layout = html.Div(id='container-main', className='container-main', children=
                             id='drop-search',
                             optionHeight=60,
                             multi=False,
-                            value=current_book_id
+                            value=DEFAULT_BOOK_ID
                         ),
                 ]),
                 
