@@ -9,7 +9,7 @@ import sqlite3
 import warnings
 import utils
 import modelreco
-from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, COMM_FILE, BOOK_FILE, MODEL_FILE, SERVER_PORT, DB_FILE
+from config import DEFAULT_BOOK_ID, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, URL_ROOT_WEBSITE, MODEL_FILE, SERVER_PORT, DB_FILE
 
 warnings.filterwarnings('ignore') 
 
@@ -81,10 +81,11 @@ def predict_reco(book_id, model_params):
     [State("slider-sen", "value"),
     State("slider-jaccard", "value"),
     State("slider-tags", "value"),
-    State("slider-rating", "value")
+    State("slider-rating", "value"),
+    State("slider-users", "value"),
     ]
 )
-def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_tags, param_rating):
+def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_tags, param_rating, param_users):
     if book_id is None:
         book_id = DEFAULT_BOOK_ID
         #raise PreventUpdate
@@ -102,7 +103,8 @@ def update_graph(book_id, n_clicks1, n_clicks2, param_sen, param_jaccard, param_
         'sen_':param_sen,
         'tag_':param_tags,
         'jaccard':param_jaccard,
-        'book_rating_value':param_rating
+        'book_rating_value':param_rating,
+        'users':param_users,
     }, DEFAULT_MODEL_PARAMS)
         
 
@@ -186,6 +188,8 @@ app.layout = html.Div(id='container-main', className='container-main', children=
                 dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['tag_'], id='slider-tags', marks=None),
                 html.P('Notes', className='title-params'),
                 dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['book_rating_value'], id='slider-rating', marks=None),
+                html.P('Communauté', className='title-params'),
+                dcc.Slider(0, 100, 1, value=DEFAULT_MODEL_PARAMS['users'], id='slider-users', marks=None),
                 dbc.Button('Mettre à jour le modèle', color="secondary", id='submit-model', n_clicks=0, className="me-1 param-button"),
             ]
             ),

@@ -7,9 +7,11 @@ class BookReco:
         self.data = None
         self.vectors = []
         self.scalars = []
+        self.users_cs = None
         self.predict_scores = None
         self.weights = {}
         self.df_jaccard = None
+        self.df_users = None
         self.data_empty = None
         self.data_score = None
 
@@ -25,9 +27,15 @@ class BookReco:
         self.weights = {**self.weights, col_name: weight}
         self.scalars.append({'col_name': col_name})
 
-    def __get_cosine_similarity(self, prefix):
-        data_temp = self.data.filter(regex=f'^{prefix}',axis=1)
-        data_temp = data_temp.fillna(0)
+    def add_users(self, df_users, weight=1):
+        self.weights = {**self.weights, 'users': weight}
+        self.df_users = df_users
+
+    def __get_cosine_similarity(self, prefix='sen_', data=None):
+        if data is None:
+            data_temp = self.data.filter(regex=f'^{prefix}',axis=1)
+            data_temp = data_temp.fillna(0)
+        else: data_temp = data
         vec = MinMaxScaler().fit_transform(data_temp)
         return cosine_similarity(vec)
 
@@ -43,6 +51,9 @@ class BookReco:
             X = self.data.loc[:,[scalar['col_name']]]
             X = MinMaxScaler().fit_transform(X)
             self.scalars[i] = {**scalar, 'scaled': X.reshape(-1)}
+
+        if self.df_users is not None:
+            self.users_cs = self.__get_cosine_similarity(prefix=None, data=self.df_users)
 
         del self.data # to reduce the size of the model. No need anymore the data
 
@@ -97,7 +108,6 @@ class BookReco:
             self.data_score = pd.concat([self.data_score, pd.Series(scalar['scaled']*weight, name=scalar['col_name'])], axis=1)
 
         self.data_score = self.data_score.set_index('book_id')
-
         
         if self.df_jaccard is not None:
             score = self.__get_jaccard_score(book_id) 
@@ -106,6 +116,15 @@ class BookReco:
                 score = score * self.weights['jaccard']
                 weight_sum += self.weights['jaccard']
                 self.data_score = self.data_score.merge(pd.Series(score, name='jaccard'), how='left', left_index=True, right_index=True)
+
+        if self.users_cs is not None:
+            score = self.users_cs[index_book]
+
+            if score is not None:
+                score = score * self.weights['users']
+                weight_sum += self.weights['users']
+                self.data_score = pd.concat([self.data_score, pd.Series(score, name='users')], axis=1)
+
 
         if weight_sum == 0:
             weight_sum == 1
