@@ -6,7 +6,7 @@ import modelreco
 import numpy as np
 import pandas as pd
 from config import DB_FILE, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, MODEL_FILE
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_distances, cosine_similarity
@@ -48,7 +48,7 @@ def get_data_byid(table, book_id, books_id_list=None):
 
 
 @app.get("/")
-async def root(id):
+async def predict(id):
     model.set_weight(DEFAULT_MODEL_PARAMS)
     scores = model.predict(int(id))
     books_id_list = [str(bid) for bid in list(scores.index)]
@@ -59,3 +59,19 @@ async def root(id):
         return {"message": "Nothing"}
     else:
         return {"message": res}
+
+@app.post("/")
+async def predict_weight(request:Request):
+    data = await request.json()
+    
+    model.set_weight(data["weights"])
+    scores = model.predict(int(data["id"]))
+    books_id_list = [str(bid) for bid in list(scores.index)]
+    df_books_reco = get_data_byid("books", None, books_id_list=books_id_list)
+    res = model.format_tojson(scores, df_books_reco, max_books=MAX_TO_PREDICT)
+
+    if res is None:
+        return {"message": "Nothing"}
+    else:
+        return {"message": res}
+    
