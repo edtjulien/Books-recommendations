@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from config import DB_FILE, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, MODEL_FILE
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_distances, cosine_similarity
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -20,6 +21,15 @@ with open(MODEL_FILE, "rb") as f:
     model = dill.load(f)
 
 app = FastAPI()
+
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_data_byid(table, book_id, books_id_list=None):

@@ -2,34 +2,34 @@
 
 const MOCKUP = [
     {
-        title : "Fils de personne",
-        url : "/livres/Pasques-Fils-de-personne/1466172",
-        image : "https://m.media-amazon.com/images/I/51FlwT9EH2L._SX95_.jpg",
-        author : "Jean-François Pasques",
+        title: "Fils de personne",
+        url: "/livres/Pasques-Fils-de-personne/1466172",
+        image: "https://m.media-amazon.com/images/I/51FlwT9EH2L._SX95_.jpg",
+        author: "Jean-François Pasques",
     },
     {
-        title : "La fille qui s’échappa d’Auschwitz",
-        url : "/livres/Midwood-La-fille-qui-sechappa-dAuschwitz/1463048",
-        image : "/couv/cvt_La-fille-qui-sechappa-dAuschwitz_8134.jpg",
-        author : "Ellie Midwood",
+        title: "La fille qui s’échappa d’Auschwitz",
+        url: "/livres/Midwood-La-fille-qui-sechappa-dAuschwitz/1463048",
+        image: "/couv/cvt_La-fille-qui-sechappa-dAuschwitz_8134.jpg",
+        author: "Ellie Midwood",
     },
     {
-        title : "Maple",
-        url : "/livres/Goudreault-Maple/1467288",
-        image : "https://m.media-amazon.com/images/I/41px-RwRutL._SX95_.jpg",
-        author : "David Goudreault",
+        title: "Maple",
+        url: "/livres/Goudreault-Maple/1467288",
+        image: "https://m.media-amazon.com/images/I/41px-RwRutL._SX95_.jpg",
+        author: "David Goudreault",
     },
     {
-        title : "1629, Les Naufragés du Jakarta, tome 1 : L'apothicaire du Diable",
-        url : "/livres/Dorison-1629-Les-Naufrages-du-Jakarta-tome-1--Lapothicai/1446523",
-        image : "/couv/cvt_1629-Les-Naufrages-du-Jakarta-tome-1--Lapothicai_566.jpg",
-        author : "Xavier Dorison",
+        title: "1629, Les Naufragés du Jakarta, tome 1 : L'apothicaire du Diable",
+        url: "/livres/Dorison-1629-Les-Naufrages-du-Jakarta-tome-1--Lapothicai/1446523",
+        image: "/couv/cvt_1629-Les-Naufrages-du-Jakarta-tome-1--Lapothicai_566.jpg",
+        author: "Xavier Dorison",
     },
     {
-        title : "Une saison pour les ombres",
-        url : "/livres/Ellory-Une-saison-pour-les-ombres/1466915",
-        image : "/couv/cvt_Une-saison-pour-les-ombres_145.jpg",
-        author : "R. J. Ellory",
+        title: "Une saison pour les ombres",
+        url: "/livres/Ellory-Une-saison-pour-les-ombres/1466915",
+        image: "/couv/cvt_Une-saison-pour-les-ombres_145.jpg",
+        author: "R. J. Ellory",
     },
 ]
 
@@ -37,25 +37,25 @@ const MOCKUP = [
 async function postData(url = '', data = {}) {
     // Default options are marked with *
     const response = await fetch(url, {
-      method: 'GET', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      //body: JSON.stringify(data) // body data type must match "Content-Type" header
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+            'Content-Type': 'application/json'
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        //body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
     return response.json(); // parses JSON response into native JavaScript objects
-  }
+}
 
 function isBookPage() {
     const item = document.querySelector("div.livre_header_con h1 a");
-    if(item) {
-        if(item.href.indexOf('/livres/') !== -1)
+    if (item) {
+        if (item.href.indexOf('/livres/') !== -1)
             return true;
         else return false;
     }
@@ -63,26 +63,26 @@ function isBookPage() {
 }
 
 function getData() {
-    if(!isBookPage())
+    if (!isBookPage())
         return;
 
     // console.log("BBBBook page :", window.location.href)
 
 
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-    // fetch('http://mldatago.com:8000/?id=1829', {
-    //     method: 'GET', // *GET, POST, PUT, DELETE, etc.
-    //     mode: 'no-cors', // no-cors, *cors, same-origin
-    // })
-    .then(data => {
-        return data;
+    // fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+    fetch('https://api.mldatago.com/?id=447057', {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, *cors, same-origin
     })
-    .then(post => {
-        //console.log(post)
+        .then(data => {
+            return data;
+        })
+        .then(post => {
+            //console.log(post)
 
-        // console.log(post);
-        createHTML(MOCKUP);
-    });
+            console.log(post);
+            // createHTML(MOCKUP);
+        });
 }
 
 function createBookHTML(book) {
