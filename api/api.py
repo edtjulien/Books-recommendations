@@ -1,10 +1,11 @@
+import sqlite3
 import warnings
 
 import dill
 import modelreco
 import numpy as np
 import pandas as pd
-from config import DEFAULT_MODEL_PARAMS
+from config import DB_FILE, DEFAULT_MODEL_PARAMS, MAX_TO_PREDICT, MODEL_FILE
 from fastapi import FastAPI
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_distances, cosine_similarity
@@ -15,18 +16,34 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 warnings.filterwarnings("ignore")
 
-with open("../output/final/model-reco.obj", "rb") as f:
-    br = dill.load(f)
+with open(MODEL_FILE, "rb") as f:
+    model = dill.load(f)
 
 app = FastAPI()
 
 
+def get_data_byid(table, book_id, books_id_list=None):
+    conn = sqlite3.connect(DB_FILE)
+    if books_id_list is not None:
+        sql_query = pd.read_sql(
+            f'SELECT * FROM {table} WHERE book_id IN ({ ",".join(books_id_list) })',
+            conn,
+        )
+    else:
+        sql_query = pd.read_sql(
+            f'SELECT * FROM {table} WHERE book_id="{book_id}"', conn
+        )
+    conn.close()
+    return pd.DataFrame(sql_query)
+
+
 @app.get("/")
 async def root(id):
-    br.set_weight(DEFAULT_MODEL_PARAMS)
-
-    scores = br.predict(int(id))
-    res = br.format_tojson(scores, max_books=5)
+    model.set_weight(DEFAULT_MODEL_PARAMS)
+    scores = model.predict(int(id))
+    books_id_list = [str(bid) for bid in list(scores.index)]
+    df_books_reco = get_data_byid("books", None, books_id_list=books_id_list)
+    res = model.format_tojson(scores, df_books_reco, max_books=MAX_TO_PREDICT)
 
     if res is None:
         return {"message": "Nothing"}

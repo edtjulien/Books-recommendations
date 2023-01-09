@@ -7,3 +7,7 @@ DEFAULT_MODEL_PARAMS = {
     "book_nb_comm": 0,
     "book_rating_count": 0,
 }
+
+MODEL_FILE = "../output/final/model-reco.obj"
+MAX_TO_PREDICT = 10
+DB_FILE = "../output/final/data.db"
